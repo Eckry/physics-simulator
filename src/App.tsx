@@ -3,10 +3,8 @@ import "./App.css";
 import { Dot } from "./types.d";
 
 const initialDots: Dot[] = [
-  { x: 35, y: 30, vx: 0, vy: 4, radius: 10, color: "RED", mass: 1 },
   { x: 50, y: 100, vx: 0, vy: -4, radius: 10, color: "GREEN", mass: 1 },
-  { x: 80, y: 54, vx: 0, vy: -4, radius: 10, color: "BLUE", mass: 1 },
-  { x: 130, y: 150, vx: 0, vy: -4, radius: 10, color: "GOLDENROD", mass: 1 },
+  { x: 130, y: 150, vx: 1, vy: -4, radius: 20, color: "GOLDENROD", mass: 5 },
 ];
 
 function App() {
@@ -36,8 +34,15 @@ function App() {
       dots.current.forEach((dot, i) => {
         if (dot.x - dot.radius < 0 || dot.x + dot.radius > canvas.width)
           dot.vx *= -1;
-        if (dot.y - dot.radius < 0 || dot.y + dot.radius > canvas.height)
+        if (dot.x - dot.radius < 0) dot.x = dot.radius;
+        if (dot.x + dot.radius > canvas.width)
+          dot.x = canvas.width - dot.radius;
+        if (dot.y - dot.radius < 0 || dot.y + dot.radius > canvas.height) {
           dot.vy *= -1;
+          if (dot.y - dot.radius < 0) dot.y = dot.radius;
+          if (dot.y + dot.radius > canvas.height)
+            dot.y = canvas.height - dot.radius;
+        }
 
         dots.current.forEach((dot2, j) => {
           if (i !== j) {
@@ -91,6 +96,7 @@ function App() {
       dots.current = dots.current.map((dot) => {
         return { ...dot, x: dot.x + dot.vx, y: dot.y + dot.vy };
       });
+
 
       requestId = requestAnimationFrame(animate);
     }
