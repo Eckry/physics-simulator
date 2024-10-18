@@ -4,4 +4,6 @@ export interface Dot {
   vx: number;
   vy: number;
   radius: number
+  color: string
+  mass: number
 }
