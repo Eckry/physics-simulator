@@ -4,8 +4,12 @@ import { Dot } from "./types.d";
 
 const initialDots: Dot[] = [
   { x: 50, y: 100, vx: 0, vy: -4, radius: 10, color: "GREEN", mass: 1 },
-  { x: 130, y: 150, vx: 1, vy: -4, radius: 20, color: "GOLDENROD", mass: 5 },
+  { x: 130, y: 150, vx: 1, vy: -4, radius: 10, color: "RED", mass: 1 },
+  { x: 80, y: 150, vx: 1, vy: -4, radius: 10, color: "BLUE", mass: 1 },
+  { x: 170, y: 150, vx: 1, vy: -4, radius: 20, color: "GOLDENROD", mass: 5 },
 ];
+
+const restitution = 1;
 
 function App() {
   const dots = useRef<Dot[]>(initialDots);
@@ -17,8 +21,8 @@ function App() {
       const canvas = ref.current;
 
       if (!canvas) return;
-      canvas.width = 200;
-      canvas.height = 200;
+      canvas.width = 500;
+      canvas.height = 400;
 
       const ctx = canvas.getContext("2d");
 
@@ -55,15 +59,12 @@ function App() {
               const dy = dot2.y - dot.y;
               const distance = Math.hypot(dx, dy);
 
-              // Normal vector
               const nx = dx / distance;
               const ny = dy / distance;
 
-              // Tangential vector (perpendicular to the normal)
               const tx = -ny;
               const ty = nx;
 
-              // Dot products of velocity vectors with normal and tangential vectors
               const dpTan1 = dot.vx * tx + dot.vy * ty;
               const dpTan2 = dot2.vx * tx + dot2.vy * ty;
 
@@ -75,10 +76,13 @@ function App() {
               const newDpNorm2 =
                 (dpNorm2 * (m2 - m1) + 2 * m1 * dpNorm1) / (m1 + m2);
 
-              dot.vx = tx * dpTan1 + nx * newDpNorm1;
-              dot.vy = ty * dpTan1 + ny * newDpNorm1;
-              dot2.vx = tx * dpTan2 + nx * newDpNorm2;
-              dot2.vy = ty * dpTan2 + ny * newDpNorm2;
+              const finalDpNorm1 = restitution * newDpNorm1;
+              const finalDpNorm2 = restitution * newDpNorm2;
+
+              dot.vx = tx * dpTan1 + nx * finalDpNorm1;
+              dot.vy = ty * dpTan1 + ny * finalDpNorm1;
+              dot2.vx = tx * dpTan2 + nx * finalDpNorm2;
+              dot2.vy = ty * dpTan2 + ny * finalDpNorm2;
 
               const overlap = dot.radius + dot2.radius - distance;
               const adjustX = (nx * overlap) / 2;
@@ -96,7 +100,6 @@ function App() {
       dots.current = dots.current.map((dot) => {
         return { ...dot, x: dot.x + dot.vx, y: dot.y + dot.vy };
       });
-
 
       requestId = requestAnimationFrame(animate);
     }
