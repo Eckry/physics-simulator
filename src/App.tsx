@@ -3,10 +3,10 @@ import "./App.css";
 import { Dot } from "./types.d";
 
 const initialDots: Dot[] = [
-  { x: 50, y: 100, vx: 0, vy: -4, radius: 10, color: "GREEN", mass: 1 },
-  { x: 130, y: 150, vx: 1, vy: -4, radius: 10, color: "RED", mass: 1 },
-  { x: 80, y: 150, vx: 1, vy: -4, radius: 10, color: "BLUE", mass: 1 },
-  { x: 170, y: 150, vx: 1, vy: -4, radius: 20, color: "GOLDENROD", mass: 5 },
+  { x: 50, y: 100, vx: 0, vy: -4, radius: 20, color: "GREEN", mass: 50 },
+  { x: 130, y: 150, vx: 6, vy: -4, radius: 20, color: "RED", mass: 5 },
+  { x: 80, y: 150, vx: 5, vy: -4, radius: 20, color: "BLUE", mass: 5 },
+  { x: 170, y: 150, vx: 4, vy: -4, radius: 20, color: "GOLDENROD", mass: 5 },
 ];
 
 const restitution = 1;
