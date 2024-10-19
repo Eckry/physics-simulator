@@ -13,7 +13,7 @@ const initialDots: Dot[] = [
 
 function App() {
   const dots = useRef<Dot[]>(initialDots);
-  const ref = useRef<null | HTMLCanvasElement>(null);
+  const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     let requestId: number;
@@ -61,7 +61,7 @@ function App() {
 
   return (
     <main>
-      <canvas ref={ref ? ref : null}></canvas>
+      <canvas ref={ref}></canvas>
     </main>
   );
 }
