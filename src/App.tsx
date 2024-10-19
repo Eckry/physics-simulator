@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { Dot } from "./types.d";
 import { calculateCollision, manageBoundaryCollision } from "./utils/functions";
@@ -12,20 +12,24 @@ const initialDots: Dot[] = [
 ];
 
 function App() {
+  const [play, setPlay] = useState(false);
   const dots = useRef<Dot[]>(initialDots);
   const ref = useRef<HTMLCanvasElement>(null);
 
+  function switchPlay() {
+    setPlay(!play);
+  }
+
   useEffect(() => {
     let requestId: number;
+
     function animate() {
       const canvas = ref.current;
 
       if (!canvas) return;
       canvas.width = CW;
       canvas.height = CH;
-
       const ctx = canvas.getContext("2d");
-
       if (!ctx) return;
 
       dots.current.forEach((dot) => {
@@ -54,14 +58,15 @@ function App() {
       requestId = requestAnimationFrame(animate);
     }
 
-    animate();
+    if (play) animate();
 
     return () => cancelAnimationFrame(requestId);
-  }, []);
+  }, [play]);
 
   return (
     <main>
-      <canvas ref={ref}></canvas>
+      <button onClick={switchPlay}>Play</button>
+      <canvas height={CH} width={CW} ref={ref}></canvas>
     </main>
   );
 }
