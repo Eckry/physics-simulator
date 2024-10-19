@@ -3,7 +3,8 @@ export interface Dot {
   y: number;
   vx: number;
   vy: number;
-  radius: number
-  color: string
-  mass: number
+  radius: number;
+  color: string;
+  mass: number;
+  isDragging: boolean;
 }

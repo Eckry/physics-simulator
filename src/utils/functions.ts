@@ -56,3 +56,16 @@ export function manageBoundaryCollision(dot: Dot) {
     if (dot.y + dot.radius > CH) dot.y = CH - dot.radius;
   }
 }
+
+export function drawDots(dots: Dot[], canvas: HTMLCanvasElement) {
+  canvas.width = CW;
+  canvas.height = CH;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  dots.forEach((dot) => {
+    ctx.beginPath();
+    ctx.arc(dot.x, dot.y, dot.radius, 0, 2 * Math.PI);
+    ctx.fillStyle = dot.color;
+    ctx.fill();
+  });
+}

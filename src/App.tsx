@@ -1,19 +1,60 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { Dot } from "./types.d";
-import { calculateCollision, manageBoundaryCollision } from "./utils/functions";
+import {
+  calculateCollision,
+  drawDots,
+  manageBoundaryCollision,
+} from "./utils/functions";
 import { CANVAS_HEIGHT as CH, CANVAS_WIDTH as CW } from "./utils/consts.d";
 
 const initialDots: Dot[] = [
-  { x: 50, y: 100, vx: 0, vy: -4, radius: 20, color: "GREEN", mass: 50 },
-  { x: 130, y: 150, vx: 6, vy: -4, radius: 20, color: "RED", mass: 5 },
-  { x: 80, y: 150, vx: 5, vy: -4, radius: 20, color: "BLUE", mass: 5 },
-  { x: 170, y: 150, vx: 4, vy: -4, radius: 20, color: "GOLDENROD", mass: 5 },
+  {
+    x: 50,
+    y: 100,
+    vx: 0,
+    vy: 0,
+    radius: 20,
+    color: "GREEN",
+    mass: 50,
+    isDragging: false,
+  },
+  {
+    x: 130,
+    y: 150,
+    vx: 6,
+    vy: -4,
+    radius: 20,
+    color: "RED",
+    mass: 5,
+    isDragging: false,
+  },
+  {
+    x: 80,
+    y: 150,
+    vx: 5,
+    vy: -4,
+    radius: 20,
+    color: "BLUE",
+    mass: 5,
+    isDragging: false,
+  },
+  {
+    x: 170,
+    y: 150,
+    vx: 4,
+    vy: -4,
+    radius: 20,
+    color: "GOLDENROD",
+    mass: 5,
+    isDragging: false,
+  },
 ];
 
 function App() {
   const [play, setPlay] = useState(false);
   const dots = useRef<Dot[]>(initialDots);
+  const isDragging = useRef(false);
   const ref = useRef<HTMLCanvasElement>(null);
 
   function switchPlay() {
@@ -24,20 +65,12 @@ function App() {
     let requestId: number;
 
     function animate() {
-      const canvas = ref.current;
-
-      if (!canvas) return;
-      canvas.width = CW;
-      canvas.height = CH;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      dots.current.forEach((dot) => {
-        ctx.beginPath();
-        ctx.arc(dot.x, dot.y, dot.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = dot.color;
-        ctx.fill();
+      if (!ref.current) return;
+      dots.current = dots.current.map((dot) => {
+        return { ...dot, x: dot.x + dot.vx, y: dot.y + dot.vy };
       });
+
+      drawDots(dots.current, ref.current);
 
       dots.current.forEach((dot, i) => {
         manageBoundaryCollision(dot);
@@ -51,10 +84,6 @@ function App() {
         });
       });
 
-      dots.current = dots.current.map((dot) => {
-        return { ...dot, x: dot.x + dot.vx, y: dot.y + dot.vy };
-      });
-
       requestId = requestAnimationFrame(animate);
     }
 
@@ -63,10 +92,56 @@ function App() {
     return () => cancelAnimationFrame(requestId);
   }, [play]);
 
+  function handleMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
+    e.preventDefault();
+    if (!ref.current) return;
+    const { left, top } = ref.current.getBoundingClientRect();
+    const x = e.clientX - left;
+    const y = e.clientY - top;
+    dots.current.forEach((dot) => {
+      const distance = Math.hypot(dot.x - x, dot.y - y);
+      if (distance < dot.radius) {
+        dot.isDragging = true;
+        isDragging.current = true;
+      }
+    });
+  }
+
+  function handleMouseUp(e: React.MouseEvent<HTMLCanvasElement>) {
+    e.preventDefault();
+    isDragging.current = false;
+
+    dots.current.forEach((dot) => {
+      dot.isDragging = false;
+    });
+  }
+
+  function handleMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
+    e.preventDefault();
+    const mx = e.movementX;
+    const my = e.movementY;
+
+    dots.current.forEach((dot) => {
+      if (dot.isDragging) {
+        dot.y += my;
+        dot.x += mx;
+      }
+    });
+    if (!ref.current) return;
+    drawDots(dots.current, ref.current);
+  }
+
   return (
     <main>
       <button onClick={switchPlay}>Play</button>
-      <canvas height={CH} width={CW} ref={ref}></canvas>
+      <canvas
+        onMouseMove={handleMouseMove}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        height={CH}
+        width={CW}
+        ref={ref}
+      ></canvas>
     </main>
   );
 }
